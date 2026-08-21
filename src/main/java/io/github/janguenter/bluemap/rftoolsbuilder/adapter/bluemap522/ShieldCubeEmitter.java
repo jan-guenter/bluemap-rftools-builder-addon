@@ -165,13 +165,13 @@ final class ShieldCubeEmitter {
         model.setPositions(start, ax, ay, az, bx, by, bz, cx, cy, cz);
         model.setPositions(start + 1, ax, ay, az, cx, cy, cz, dx, dy, dz);
         model.setUvs(start,
-                projectedU(direction, ax, az), projectedV(direction, ay, az),
-                projectedU(direction, bx, bz), projectedV(direction, by, bz),
-                projectedU(direction, cx, cz), projectedV(direction, cy, cz));
+                0F, 0F,
+                0F, 1F,
+                1F, 1F);
         model.setUvs(start + 1,
-                projectedU(direction, ax, az), projectedV(direction, ay, az),
-                projectedU(direction, cx, cz), projectedV(direction, cy, cz),
-                projectedU(direction, dx, dz), projectedV(direction, dy, dz));
+                0F, 0F,
+                1F, 1F,
+                1F, 0F);
         model.setMaterialIndex(start, material);
         model.setMaterialIndex(start + 1, material);
         float red = mode == ShieldRenderMode.SHIELD ? MINT_RED : 1F;
@@ -187,20 +187,6 @@ final class ShieldCubeEmitter {
         model.setSunlight(start + 1, light.sunlight());
         model.setBlocklight(start, light.blocklight());
         model.setBlocklight(start + 1, light.blocklight());
-    }
-
-    private static float projectedU(Direction direction, float x, float z) {
-        return switch (direction) {
-            case DOWN, UP, NORTH, SOUTH -> x;
-            case WEST, EAST -> z;
-        };
-    }
-
-    private static float projectedV(Direction direction, float y, float z) {
-        return switch (direction) {
-            case DOWN, UP -> z;
-            case NORTH, SOUTH, WEST, EAST -> 1F - y;
-        };
     }
 
     private static LightSample sampleLight(BlockNeighborhood block, Direction direction) {
