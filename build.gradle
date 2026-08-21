@@ -49,6 +49,10 @@ tasks.withType(AbstractArchiveTask).configureEach {
     reproducibleFileOrder = true
 }
 
+tasks.withType(Zip).configureEach {
+    entryCompression = ZipEntryCompression.STORED
+}
+
 tasks.named('test', Test).configure {
     useJUnitPlatform()
     def exactJar = providers.gradleProperty('rftoolsBuilderJar')

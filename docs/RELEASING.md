@@ -28,8 +28,10 @@ Run the deterministic [gallery](../gallery/README.md) against that exact JAR,
 open the intended BlueMap link for the required lightweight sanity check, and
 obtain explicit owner acceptance. The accepted synthetic fixture does not
 prove natural saved-NBT behavior or exact-client renderer parity. Do not
-substitute a functional rebuild afterward; only the recorded final-version
-manifest transition is permitted.
+substitute a functional rebuild afterward. All accepted entry bytes are frozen;
+only the recorded final-version manifest transition is permitted. Release JAR
+entries use ZIP `STORED` compression to make the surrounding archive bytes
+independent of host deflate implementations.
 
 Before tagging, merge the independently audited release pull request. Create
 and push an annotated `v<addon_version>` tag at that reviewed `main` commit.

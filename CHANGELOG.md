@@ -11,3 +11,5 @@
   modes and preserve installed texture alpha through BlueMap's texture gallery.
 - Add focused Java 21 tests, strict artifact/resource validation, atomic stock
   fallback, deterministic staging gallery evidence, and release-byte gates.
+- Store release JAR entries without compression so exact archive bytes remain
+  reproducible across the accepted local and hosted Java environments.

@@ -29,13 +29,13 @@
   "final_release_artifacts": {
     "production_jar": {
       "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.jar",
-      "size": 33579,
-      "sha256": "a69f19cc4175b5821229ca08e15a411ee7e84082cd352a8bc6d8faf5ef756e5b"
+      "size": 65630,
+      "sha256": "612f13ac5969282fba8aea986bda75225740858578caf1dc59fdd9a493046c2e"
     },
     "sources_jar": {
       "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1-sources.jar",
-      "size": 20323,
-      "sha256": "cdba30ddc1d73324f06b8a68706bc349fed39645b4858a069367b44ae56dfdb2"
+      "size": 46071,
+      "sha256": "151d339992c7a79cdc7098e28a1bc687d4d591bcec7234ce130ed448f67c2dc9"
     },
     "pom": {
       "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.pom",
@@ -45,20 +45,21 @@
     "gradle_module": {
       "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.module.json",
       "size": 2873,
-      "sha256": "b7b864db91606c4d1a725ee8265114b1ee3046b8c7fc292589bc7379029abe92"
+      "sha256": "3212228e456c6a555afcf882608957a8ec2e89bce32362d19e77bc411523e5fc"
     },
     "sha256sums": {
       "file_name": "SHA256SUMS",
       "size": 480,
-      "sha256": "288c305b874b86fedb09489fc8b0a71f3120b7cefdcf6a58e80bdb0012dfb746"
+      "sha256": "0aa0d3aadf0670f28397dbc4d8d2f4dbc7ed04d56a883737316d000a1deaf424"
     }
   },
   "staged_equivalence": {
     "entry_manifest": "provenance/accepted-staging-entries.sha256",
     "identical_non_manifest_entries": 22,
     "whole_jar_byte_identical": false,
-    "only_changed_entry": "META-INF/MANIFEST.MF",
-    "change_reason": "Implementation-Version changed from the staged SNAPSHOT marker to the final release version."
+    "only_changed_entry_bytes": "META-INF/MANIFEST.MF",
+    "change_reason": "Implementation-Version changed from the staged SNAPSHOT marker to the final release version.",
+    "archive_normalization": "Every release JAR entry uses ZIP STORED compression so archive bytes do not depend on the host deflate implementation."
   },
   "gallery": {
     "archive_file_name": "bluemap-rftools-builder-gallery.zip",
