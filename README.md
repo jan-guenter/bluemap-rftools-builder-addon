@@ -1,9 +1,15 @@
 # BlueMap RFTools Builder Add-on
 
+[![CI](https://github.com/jan-guenter/bluemap-rftools-builder-addon/actions/workflows/ci.yml/badge.svg)](https://github.com/jan-guenter/bluemap-rftools-builder-addon/actions/workflows/ci.yml)
+
 A narrow Java 21 BlueMap 5.22 add-on for the dynamic RFToolsBuilder shield
 blocks that BlueMap's ordinary resource-model path cannot interpret.
 
-This prototype activates only with the exact All the Mons 1.2.0
+Version `0.1.0-alpha.1` is the owner-accepted release candidate. Its final
+production JAR is 33,579 bytes with SHA-256
+`a69f19cc4175b5821229ca08e15a411ee7e84082cd352a8bc6d8faf5ef756e5b`.
+
+The add-on activates only with the exact All the Mons 1.2.0
 `rftoolsbuilder-1.21-7.0.5.jar` (1,054,852 bytes, SHA-256
 `802cea7c7eb5d6a25d820113bdd9f59fe0c15b390265b4964a46dcf024cdffa6`).
 It redirects exactly the solid, translucent, and cutout shielding block IDs to
@@ -25,10 +31,19 @@ or captured mesh is packaged.
 ## Build
 
 ```bash
-../bluemap-backport/gradlew --no-daemon \
+gradle --no-daemon \
   -PrftoolsBuilderJar=/absolute/path/rftoolsbuilder-1.21-7.0.5.jar \
-  clean check build
+  -PreleaseTag=v0.1.0-alpha.1 \
+  clean check build generatePomFileForAddonPublication \
+  generateMetadataFileForAddonPublication verifyPublicationArtifacts \
+  verifyReleaseCandidate
 ```
 
 The output JAR belongs in BlueMap's `packs` directory. Removing it and
 restarting restores stock rendering without changing world data.
+
+The intended immutable tag is `v0.1.0-alpha.1`, and the Maven coordinate is
+`io.github.jan-guenter:bluemap-rftools-builder-addon:0.1.0-alpha.1`.
+Publication is allowed only after the independently audited pull request and
+its final-head CI pass. See [the release procedure](docs/RELEASING.md) and
+[recorded candidate provenance](provenance/release.json).

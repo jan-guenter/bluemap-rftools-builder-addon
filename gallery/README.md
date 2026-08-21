@@ -13,6 +13,13 @@ confined to inclusive x `160..183`, y `99..104`, z `160..183` in a disposable
 staging world. Its smooth-stone pad occupies x `160..180`, y `99`,
 z `160..181`.
 
+This exact gallery archive is 3,551 bytes with SHA-256
+`67886fc6796f8bcf7e67c4245d355725a03f0d3c5fa953ca3c8facdf8a9b9988`.
+The owner accepted its BlueMap render on 2026-08-21 at add-on commit
+`18b11a27b03ad1001524d66f75233dcec1676f19`. That acceptance is synthetic
+staging evidence, not a claim of natural saved-NBT behavior or exact-client
+renderer parity.
+
 ## Cells
 
 | Section | Fixture | Exact coordinates | Count | Purpose |

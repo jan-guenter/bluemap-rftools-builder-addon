@@ -24,16 +24,21 @@ standalone repository.
   mode, and orphan-projector white fallback remain stock in this alpha.
 - Package no RFToolsBuilder asset, class, source, archive, or derived mesh.
 
-## Gate
+## Minimum gate
 
-The system Gradle package may be unusable; the pinned BlueMap wrapper is an
-accepted launcher for this project:
+Use the exact promotion Gradle `9.6.1`; other Gradle versions can change the
+published module metadata even when the JARs remain byte-identical:
 
 ```bash
-../bluemap-backport/gradlew --no-daemon \
+gradle --no-daemon \
   -PrftoolsBuilderJar=/absolute/path/rftoolsbuilder-1.21-7.0.5.jar \
-  clean check build
+  -PreleaseTag=v0.1.0-alpha.1 \
+  clean check build generatePomFileForAddonPublication \
+  generateMetadataFileForAddonPublication verifyPublicationArtifacts \
+  verifyReleaseCandidate
 ```
 
-Do not claim staging, client parity, owner acceptance, release, or deployment
-unless that exact action has been observed.
+Do not claim natural-fixture behavior, client parity, publication, or
+deployment unless that exact gate runs. Release promotion also requires the
+independent audit, hosted CI, exact annotated tag, and publication checks in
+`docs/RELEASING.md`.
