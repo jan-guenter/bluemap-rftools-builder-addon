@@ -1,0 +1,216 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Immutable annotated v* tag to release or safely resume
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+  attestations: write
+  id-token: write
+
+env:
+  PROMOTION_JAVA_VERSION: '21.0.12+8.0.LTS'
+  RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+
+concurrency:
+  group: release-maven-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify immutable annotated release identity
+        run: |
+          version="$(sed -n 's/^addon_version=//p' gradle.properties)"
+          test -n "${version}"
+          [[ "${version}" != *-SNAPSHOT ]]
+          [[ "${RELEASE_TAG}" =~ ^v[0-9A-Za-z][0-9A-Za-z.+-]*$ ]]
+          test "${RELEASE_TAG}" = "v${version}"
+          git fetch --force --tags origin
+          test "$(git cat-file -t "refs/tags/${RELEASE_TAG}")" = tag
+          test "$(git rev-parse 'HEAD^{commit}')" = \
+            "$(git rev-parse "refs/tags/${RELEASE_TAG}^{commit}")"
+          git fetch --no-tags origin main:refs/remotes/origin/main
+          git merge-base --is-ancestor HEAD refs/remotes/origin/main
+          echo "VERSION=${version}" >> "${GITHUB_ENV}"
+
+      - name: Check out exact BlueMap backport
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: jan-guenter/BlueMap
+          ref: 9be321df995a1103808621d529eb72773e719d4d
+          path: .ci/bluemap
+          submodules: recursive
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify exact detached BlueMap identities
+        run: |
+          test "$(git -C .ci/bluemap rev-parse --abbrev-ref HEAD)" = "HEAD"
+          test "$(git -C .ci/bluemap rev-parse HEAD)" = \
+            "9be321df995a1103808621d529eb72773e719d4d"
+          test "$(git -C .ci/bluemap/api rev-parse HEAD)" = \
+            "285c9a60eff3ac2b0cab308ce1058d1565be0971"
+          git -C .ci/bluemap fetch --force --tags origin
+          test "$(git -C .ci/bluemap describe --exact-match --tags HEAD)" = \
+            "v5.22-agent.backport-5.22-mc1.21.1-2"
+
+      - name: Set up exact promotion Java 21
+        uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
+        with:
+          distribution: temurin
+          java-version: ${{ env.PROMOTION_JAVA_VERSION }}
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+
+      - name: Set up Gradle 9.6.1
+        uses: gradle/actions/setup-gradle@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+        with:
+          gradle-version: '9.6.1'
+          cache-provider: basic
+          cache-read-only: true
+          validate-wrappers: true
+
+      - name: Acquire exact ephemeral RFToolsBuilder input
+        run: |
+          input_dir="${RUNNER_TEMP}/rftoolsbuilder-input"
+          mkdir -p "${input_dir}"
+          curl --fail --location --retry 3 --retry-all-errors \
+            --output "${input_dir}/rftoolsbuilder-1.21-7.0.5.jar" \
+            "https://www.curseforge.com/api/v1/mods/347706/files/8256217/download"
+          test "$(stat -c %s \
+            "${input_dir}/rftoolsbuilder-1.21-7.0.5.jar")" -eq 1054852
+          sha256sum --check <<SHA256SUMS
+          802cea7c7eb5d6a25d820113bdd9f59fe0c15b390265b4964a46dcf024cdffa6  ${input_dir}/rftoolsbuilder-1.21-7.0.5.jar
+          SHA256SUMS
+
+      - name: Verify gallery and provenance inputs
+        run: |
+          python3 -m json.tool provenance/upstreams.json >/dev/null
+          python3 -m json.tool provenance/release.json >/dev/null
+          python3 gallery/generate.py --check
+          python3 gallery/lint.py
+          (cd gallery && sha256sum --check SHA256SUMS)
+          bash gallery/package.sh "${RUNNER_TEMP}/gallery-first.zip"
+          bash gallery/package.sh "${RUNNER_TEMP}/gallery-second.zip"
+          cmp "${RUNNER_TEMP}/gallery-first.zip" \
+            "${RUNNER_TEMP}/gallery-second.zip"
+          test "$(stat -c %s "${RUNNER_TEMP}/gallery-first.zip")" -eq 3551
+          sha256sum --check <<SHA256SUMS
+          67886fc6796f8bcf7e67c4245d355725a03f0d3c5fa953ca3c8facdf8a9b9988  ${RUNNER_TEMP}/gallery-first.zip
+          SHA256SUMS
+
+      - name: Build and verify accepted bytes
+        run: |
+          input_dir="${RUNNER_TEMP}/rftoolsbuilder-input"
+          gradle --no-daemon \
+            -PbluemapSourcePath=.ci/bluemap \
+            -PrftoolsBuilderJar="${input_dir}/rftoolsbuilder-1.21-7.0.5.jar" \
+            "-PreleaseTag=${RELEASE_TAG}" \
+            clean check build generatePomFileForAddonPublication \
+            generateMetadataFileForAddonPublication \
+            verifyPublicationArtifacts verifyReleaseCandidate
+          test "$(stat -c %s \
+            "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar")" -eq 65006
+          test "$(stat -c %s \
+            "build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar")" -eq 46071
+          test "$(stat -c %s build/publications/addon/pom-default.xml)" -eq 1378
+          test "$(stat -c %s build/publications/addon/module.json)" -eq 2873
+          sha256sum --check <<SHA256SUMS
+          776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6  build/libs/bluemap-rftools-builder-addon-${VERSION}.jar
+          151d339992c7a79cdc7098e28a1bc687d4d591bcec7234ce130ed448f67c2dc9  build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar
+          474907777785ec36ab0fecc385ac96b7941d2dd36864cf7d6c236b985956901d  build/publications/addon/pom-default.xml
+          93b7081cb7f1ef6e38c7a589daa496147046110c83315030896c83163cc1ea19  build/publications/addon/module.json
+          SHA256SUMS
+          python3 tools/verify_staged_equivalence.py \
+            --jar "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar" \
+            --entries provenance/accepted-staging-entries.sha256
+
+      - name: Prepare deterministic release bundle
+        run: |
+          mkdir release
+          cp "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar" release/
+          cp "build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar" \
+            release/
+          cp build/publications/addon/pom-default.xml \
+            "release/bluemap-rftools-builder-addon-${VERSION}.pom"
+          cp build/publications/addon/module.json \
+            "release/bluemap-rftools-builder-addon-${VERSION}.module.json"
+          (
+            cd release
+            sha256sum -- \
+              "./bluemap-rftools-builder-addon-${VERSION}-sources.jar" \
+              "./bluemap-rftools-builder-addon-${VERSION}.jar" \
+              "./bluemap-rftools-builder-addon-${VERSION}.module.json" \
+              "./bluemap-rftools-builder-addon-${VERSION}.pom" \
+              > SHA256SUMS
+          )
+          (cd release && sha256sum --check SHA256SUMS)
+          test "$(stat -c %s release/SHA256SUMS)" -eq 480
+          test "$(sha256sum release/SHA256SUMS | cut -d ' ' -f 1)" = \
+            dd4c4eb583f3e00435870a7e10e08bdc762afe3076149055e92d4da75e1298cc
+
+      - name: Create or refresh draft prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            test "$(gh release view "${RELEASE_TAG}" \
+              --json isDraft --jq '.isDraft')" = true
+            gh release upload "${RELEASE_TAG}" release/* --clobber
+          else
+            gh release create "${RELEASE_TAG}" release/* \
+              --draft \
+              --prerelease \
+              --generate-notes \
+              --title "BlueMap RFTools Builder Add-on ${VERSION}" \
+              --verify-tag
+          fi
+
+      - name: Attest release assets with Sigstore
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373 # v4.1.1
+        with:
+          subject-path: release/*
+
+      - name: Publish Maven package
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gradle --no-daemon \
+            -PbluemapSourcePath=.ci/bluemap \
+            -PrftoolsBuilderJar="${RUNNER_TEMP}/rftoolsbuilder-input/rftoolsbuilder-1.21-7.0.5.jar" \
+            publishAddonPublicationToGitHubPackagesRepository
+
+      - name: Verify draft assets and publish public prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          downloaded="${RUNNER_TEMP}/release-assets"
+          mkdir -p "${downloaded}"
+          gh release download "${RELEASE_TAG}" --dir "${downloaded}"
+          for asset in release/*; do
+            cmp "${asset}" "${downloaded}/$(basename "${asset}")"
+          done
+          gh release edit "${RELEASE_TAG}" --draft=false --prerelease

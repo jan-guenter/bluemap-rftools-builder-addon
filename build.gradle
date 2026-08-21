@@ -3,6 +3,7 @@
 plugins {
     id 'java-library'
     id 'checkstyle'
+    id 'maven-publish'
 }
 
 group = addon_group
@@ -48,6 +49,10 @@ tasks.withType(AbstractArchiveTask).configureEach {
     reproducibleFileOrder = true
 }
 
+tasks.withType(Zip).configureEach {
+    entryCompression = ZipEntryCompression.STORED
+}
+
 tasks.named('test', Test).configure {
     useJUnitPlatform()
     def exactJar = providers.gradleProperty('rftoolsBuilderJar')
@@ -69,6 +74,7 @@ tasks.withType(Checkstyle).configureEach {
 }
 
 tasks.named('jar', Jar).configure {
+    includeEmptyDirs = false
     manifest {
         attributes(
                 'Automatic-Module-Name': 'io.github.janguenter.bluemap.rftoolsbuilder',
@@ -110,6 +116,58 @@ tasks.named('sourcesJar', Jar).configure {
     from('provenance/upstreams.json') { into 'META-INF/bluemap-rftoolsbuilder' }
 }
 
+def productionJar = tasks.named('jar', Jar).flatMap { it.archiveFile }
+def publishedSourcesJar = tasks.named('sourcesJar', Jar).flatMap { it.archiveFile }
+
+tasks.register('verifyAcceptedProductionJar') {
+    dependsOn tasks.named('jar')
+    inputs.file(productionJar)
+    doLast {
+        def jarFile = inputs.files.singleFile
+        def expectedSize = providers.gradleProperty('accepted_jar_size').get().toLong()
+        def expectedSha256 = providers.gradleProperty('accepted_jar_sha256').get()
+        def actualSha256 = java.security.MessageDigest.getInstance('SHA-256')
+                .digest(jarFile.bytes)
+                .encodeHex()
+                .toString()
+        if (jarFile.length() != expectedSize || actualSha256 != expectedSha256) {
+            throw new GradleException(
+                    "Accepted production JAR mismatch: ${jarFile.length()} bytes, "
+                            + "SHA-256 ${actualSha256}"
+            )
+        }
+    }
+}
+
+tasks.register('verifyAcceptedSourcesJar') {
+    dependsOn tasks.named('sourcesJar')
+    inputs.file(publishedSourcesJar)
+    doLast {
+        def jarFile = inputs.files.singleFile
+        def expectedSize = providers.gradleProperty('accepted_sources_jar_size').get().toLong()
+        def expectedSha256 = providers.gradleProperty('accepted_sources_jar_sha256').get()
+        def actualSha256 = java.security.MessageDigest.getInstance('SHA-256')
+                .digest(jarFile.bytes)
+                .encodeHex()
+                .toString()
+        if (jarFile.length() != expectedSize || actualSha256 != expectedSha256) {
+            throw new GradleException(
+                    "Accepted sources JAR mismatch: ${jarFile.length()} bytes, "
+                            + "SHA-256 ${actualSha256}"
+            )
+        }
+    }
+}
+
+tasks.register('verifyStagedEquivalence', Exec) {
+    dependsOn tasks.named('jar')
+    inputs.file(productionJar)
+    inputs.file('provenance/accepted-staging-entries.sha256')
+    commandLine 'python3', 'tools/verify_staged_equivalence.py',
+            '--jar', productionJar.get().asFile,
+            '--entries', 'provenance/accepted-staging-entries.sha256'
+}
+
 tasks.register('verifyPinnedArtifact') {
     def exactJar = providers.gradleProperty('rftoolsBuilderJar')
     inputs.property('expectedSize', 1054852L)
@@ -138,7 +196,6 @@ tasks.register('verifyPinnedArtifact') {
 
 tasks.register('verifyProductionJar') {
     dependsOn tasks.named('jar')
-    def productionJar = tasks.named('jar', Jar).flatMap { it.archiveFile }
     inputs.file(productionJar)
     doLast {
         def zip = new java.util.zip.ZipFile(inputs.files.singleFile)
@@ -175,7 +232,9 @@ tasks.register('verifyProductionJar') {
                         || it.startsWith('net/minecraft/')
                         || it.startsWith('net/neoforged/')
                         || it.startsWith('mcjty/')
+                        || it.startsWith('de/bluecolored/')
                         || it.startsWith('assets/rftoolsbuilder/')
+                        || it.startsWith('gallery/')
                         || it.endsWith('.png')
                         || it.endsWith('.mcmeta')
             }
@@ -188,7 +247,154 @@ tasks.register('verifyProductionJar') {
     }
 }
 
+tasks.register('verifySourcesJar') {
+    dependsOn tasks.named('sourcesJar')
+    inputs.file(publishedSourcesJar)
+    doLast {
+        def zip = new java.util.zip.ZipFile(inputs.files.singleFile)
+        try {
+            def entries = zip.entries().findAll { !it.directory }.collect { it.name }
+            def required = [
+                    'io/github/janguenter/bluemap/rftoolsbuilder/BlueMapRftoolsBuilderAddon.java',
+                    'io/github/janguenter/bluemap/rftoolsbuilder/adapter/bluemap522/ShieldCubeEmitter.java',
+                    'bluemap.addon.json',
+                    'assets/bluemap_rftoolsbuilder/blockstates/shield.json',
+                    'bluemap-rftools-builder/profiles/rftoolsbuilder/1.21-7.0.5/profile.json',
+                    'META-INF/LICENSE-bluemap-rftools-builder-addon',
+                    'META-INF/LICENSE-BlueMap',
+                    'META-INF/NOTICE-bluemap-rftools-builder-addon.md',
+                    'META-INF/THIRD_PARTY-bluemap-rftools-builder-addon.md',
+                    'META-INF/bluemap-rftoolsbuilder/upstreams.json'
+            ]
+            def missing = required.findAll { !entries.contains(it) }
+            if (!missing.isEmpty()) {
+                throw new GradleException("Sources JAR is missing: ${missing}")
+            }
+            def projectJava = entries.findAll { it.endsWith('.java') }
+            def foreignJava = projectJava.findAll {
+                !it.startsWith('io/github/janguenter/bluemap/rftoolsbuilder/')
+            }
+            def forbidden = entries.findAll {
+                it.endsWith('.class')
+                        || it.endsWith('.jar')
+                        || it.endsWith('.png')
+                        || it.startsWith('assets/rftoolsbuilder/')
+                        || it.startsWith('mcjty/')
+                        || it.startsWith('de/bluecolored/')
+                        || it.startsWith('net/minecraft/')
+                        || it.startsWith('net/neoforged/')
+                        || it.startsWith('gallery/')
+            }
+            if (projectJava.isEmpty() || !foreignJava.isEmpty() || !forbidden.isEmpty()) {
+                throw new GradleException(
+                        "Sources JAR boundary mismatch: foreignJava=${foreignJava}, "
+                                + "forbidden=${forbidden}"
+                )
+            }
+        } finally {
+            zip.close()
+        }
+    }
+}
+
 tasks.named('check').configure {
+    dependsOn tasks.named('verifyAcceptedProductionJar')
+    dependsOn tasks.named('verifyAcceptedSourcesJar')
     dependsOn tasks.named('verifyPinnedArtifact')
     dependsOn tasks.named('verifyProductionJar')
+    dependsOn tasks.named('verifySourcesJar')
+    dependsOn tasks.named('verifyStagedEquivalence')
+}
+
+tasks.register('verifyPublicationArtifacts') {
+    dependsOn tasks.named('generatePomFileForAddonPublication')
+    dependsOn tasks.named('generateMetadataFileForAddonPublication')
+    doLast {
+        def artifacts = [
+                [file('build/publications/addon/pom-default.xml'),
+                 providers.gradleProperty('accepted_pom_size').get().toLong(),
+                 providers.gradleProperty('accepted_pom_sha256').get()],
+                [file('build/publications/addon/module.json'),
+                 providers.gradleProperty('accepted_module_size').get().toLong(),
+                 providers.gradleProperty('accepted_module_sha256').get()]
+        ]
+        artifacts.each { artifact, expectedSize, expectedSha256 ->
+            def actualSha256 = java.security.MessageDigest.getInstance('SHA-256')
+                    .digest(artifact.bytes)
+                    .encodeHex()
+                    .toString()
+            if (artifact.length() != expectedSize || actualSha256 != expectedSha256) {
+                throw new GradleException(
+                        "Publication artifact mismatch for ${artifact}: "
+                                + "${artifact.length()} bytes, SHA-256 ${actualSha256}"
+                )
+            }
+        }
+        def pom = file('build/publications/addon/pom-default.xml').text
+        def module = new groovy.json.JsonSlurper().parse(
+                file('build/publications/addon/module.json')
+        )
+        if (!pom.contains("<version>${project.version}</version>")
+                || module.component.version != project.version.toString()
+                || project.version.toString().endsWith('-SNAPSHOT')) {
+            throw new GradleException('Publication metadata is not the final release version')
+        }
+    }
+}
+
+tasks.register('verifyReleaseMetadata') {
+    doLast {
+        def expectedTag = "v${project.version}"
+        def requestedTag = providers.gradleProperty('releaseTag').getOrElse('')
+        if (project.version.toString().endsWith('-SNAPSHOT')) {
+            throw new GradleException('Release versions must not end in -SNAPSHOT')
+        }
+        if (requestedTag != expectedTag) {
+            throw new GradleException(
+                    "Release tag mismatch: ${requestedTag ?: '<unset>'} != ${expectedTag}"
+            )
+        }
+    }
+}
+
+tasks.register('verifyReleaseCandidate') {
+    dependsOn tasks.named('check')
+    dependsOn tasks.named('verifyPinnedArtifact')
+    dependsOn tasks.named('verifyPublicationArtifacts')
+    dependsOn tasks.named('verifyReleaseMetadata')
+}
+
+publishing {
+    publications {
+        addon(MavenPublication) {
+            from components.java
+            artifactId = artifact_id
+            pom {
+                name = addon_name
+                description = 'Exact-profile BlueMap rendering for RFToolsBuilder shield blocks.'
+                url = 'https://github.com/jan-guenter/bluemap-rftools-builder-addon'
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'https://spdx.org/licenses/MIT.html'
+                        distribution = 'repo'
+                    }
+                }
+                scm {
+                    url = 'https://github.com/jan-guenter/bluemap-rftools-builder-addon'
+                    connection = 'scm:git:https://github.com/jan-guenter/bluemap-rftools-builder-addon.git'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri('https://maven.pkg.github.com/jan-guenter/bluemap-rftools-builder-addon')
+            credentials {
+                username = System.getenv('GITHUB_ACTOR')
+                password = System.getenv('GITHUB_TOKEN')
+            }
+        }
+    }
 }
