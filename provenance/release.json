@@ -29,8 +29,8 @@
   "final_release_artifacts": {
     "production_jar": {
       "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.jar",
-      "size": 65630,
-      "sha256": "612f13ac5969282fba8aea986bda75225740858578caf1dc59fdd9a493046c2e"
+      "size": 65006,
+      "sha256": "776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6"
     },
     "sources_jar": {
       "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1-sources.jar",
@@ -45,12 +45,12 @@
     "gradle_module": {
       "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.module.json",
       "size": 2873,
-      "sha256": "3212228e456c6a555afcf882608957a8ec2e89bce32362d19e77bc411523e5fc"
+      "sha256": "93b7081cb7f1ef6e38c7a589daa496147046110c83315030896c83163cc1ea19"
     },
     "sha256sums": {
       "file_name": "SHA256SUMS",
       "size": 480,
-      "sha256": "0aa0d3aadf0670f28397dbc4d8d2f4dbc7ed04d56a883737316d000a1deaf424"
+      "sha256": "dd4c4eb583f3e00435870a7e10e08bdc762afe3076149055e92d4da75e1298cc"
     }
   },
   "staged_equivalence": {
@@ -59,7 +59,7 @@
     "whole_jar_byte_identical": false,
     "only_changed_entry_bytes": "META-INF/MANIFEST.MF",
     "change_reason": "Implementation-Version changed from the staged SNAPSHOT marker to the final release version.",
-    "archive_normalization": "Every release JAR entry uses ZIP STORED compression so archive bytes do not depend on the host deflate implementation."
+    "archive_normalization": "Every release JAR entry uses ZIP STORED compression and empty directories are excluded so archive bytes do not depend on host compression or untracked filesystem directories."
   },
   "gallery": {
     "archive_file_name": "bluemap-rftools-builder-gallery.zip",

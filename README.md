@@ -6,8 +6,8 @@ A narrow Java 21 BlueMap 5.22 add-on for the dynamic RFToolsBuilder shield
 blocks that BlueMap's ordinary resource-model path cannot interpret.
 
 Version `0.1.0-alpha.1` is the owner-accepted release candidate. Its final
-production JAR is 65,630 bytes with SHA-256
-`612f13ac5969282fba8aea986bda75225740858578caf1dc59fdd9a493046c2e`.
+production JAR is 65,006 bytes with SHA-256
+`776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6`.
 
 The add-on activates only with the exact All the Mons 1.2.0
 `rftoolsbuilder-1.21-7.0.5.jar` (1,054,852 bytes, SHA-256

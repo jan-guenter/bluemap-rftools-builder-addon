@@ -117,16 +117,16 @@ jobs:
             generateMetadataFileForAddonPublication \
             verifyPublicationArtifacts verifyReleaseCandidate
           test "$(stat -c %s \
-            "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar")" -eq 65630
+            "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar")" -eq 65006
           test "$(stat -c %s \
             "build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar")" -eq 46071
           test "$(stat -c %s build/publications/addon/pom-default.xml)" -eq 1378
           test "$(stat -c %s build/publications/addon/module.json)" -eq 2873
           sha256sum --check <<SHA256SUMS
-          612f13ac5969282fba8aea986bda75225740858578caf1dc59fdd9a493046c2e  build/libs/bluemap-rftools-builder-addon-${VERSION}.jar
+          776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6  build/libs/bluemap-rftools-builder-addon-${VERSION}.jar
           151d339992c7a79cdc7098e28a1bc687d4d591bcec7234ce130ed448f67c2dc9  build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar
           474907777785ec36ab0fecc385ac96b7941d2dd36864cf7d6c236b985956901d  build/publications/addon/pom-default.xml
-          3212228e456c6a555afcf882608957a8ec2e89bce32362d19e77bc411523e5fc  build/publications/addon/module.json
+          93b7081cb7f1ef6e38c7a589daa496147046110c83315030896c83163cc1ea19  build/publications/addon/module.json
           SHA256SUMS
           python3 tools/verify_staged_equivalence.py \
             --jar "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar" \

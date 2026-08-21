@@ -30,8 +30,9 @@ obtain explicit owner acceptance. The accepted synthetic fixture does not
 prove natural saved-NBT behavior or exact-client renderer parity. Do not
 substitute a functional rebuild afterward. All accepted entry bytes are frozen;
 only the recorded final-version manifest transition is permitted. Release JAR
-entries use ZIP `STORED` compression to make the surrounding archive bytes
-independent of host deflate implementations.
+entries use ZIP `STORED` compression and exclude empty directories to make the
+surrounding archive bytes independent of host deflate implementations and
+untracked filesystem directories.
 
 Before tagging, merge the independently audited release pull request. Create
 and push an annotated `v<addon_version>` tag at that reviewed `main` commit.
