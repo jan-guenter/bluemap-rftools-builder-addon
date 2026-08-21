@@ -1,0 +1,12 @@
+section	label	x	y	z	block_state	block_entity_nbt	expected
+A	stock projector and default render-data source	164	100	164	rftoolsbuilder:shield_block1	-	stock-control
+A	stock blue shield template	168	100	164	rftoolsbuilder:blue_shield_template_block	-	stock-control
+A	stock bricks	172	100	164	minecraft:bricks	-	stock-control
+B	isolated shield default mint	164	100	171	rftoolsbuilder:shielding_translucent[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=shield]	{sx:164,sy:100,sz:164}	custom-visible
+B	isolated transparent default mint	168	100	171	rftoolsbuilder:shielding_translucent[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=transp]	{sx:164,sy:100,sz:164}	custom-visible
+B	isolated solid default mint	172	100	171	rftoolsbuilder:shielding_solid[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=solid]	{sx:164,sy:100,sz:164}	custom-visible
+B	invisible zero-geometry control	176	100	171	rftoolsbuilder:shielding_translucent[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=invisible]	{sx:164,sy:100,sz:164}	custom-zero
+C	shield cluster top parity 0 north-west	164	100	178	rftoolsbuilder:shielding_translucent[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=shield]	{sx:164,sy:100,sz:164}	custom-visible
+C	shield cluster top parity 1 north-east	165	100	178	rftoolsbuilder:shielding_translucent[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=shield]	{sx:164,sy:100,sz:164}	custom-visible
+C	shield cluster top parity 2 south-west	164	100	179	rftoolsbuilder:shielding_translucent[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=shield]	{sx:164,sy:100,sz:164}	custom-visible
+C	shield cluster top parity 3 south-east	165	100	179	rftoolsbuilder:shielding_translucent[bh=false,bi=false,bp=false,bplay=false,dh=false,di=false,dp=false,dplay=false,opaque=true,render=shield]	{sx:164,sy:100,sz:164}	custom-visible
