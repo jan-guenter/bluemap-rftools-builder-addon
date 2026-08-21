@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "minecraft": "1.21.1",
+  "neoforge": "21.1.248",
+  "rftoolsbuilder": {
+    "version": "1.21-7.0.5",
+    "size": 1054852,
+    "sha256": "802cea7c7eb5d6a25d820113bdd9f59fe0c15b390265b4964a46dcf024cdffa6"
+  },
+  "hosts": [
+    "rftoolsbuilder:shielding_solid",
+    "rftoolsbuilder:shielding_translucent",
+    "rftoolsbuilder:shielding_cutout"
+  ],
+  "modes": ["invisible", "shield", "transp", "solid"],
+  "excludedModes": ["mimic"],
+  "renderData": "natural-default-mint-default-shield-texture"
+}

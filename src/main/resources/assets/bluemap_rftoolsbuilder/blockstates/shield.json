@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "": {
+      "renderer": "bluemap_rftoolsbuilder:shield",
+      "model": "bluemap:block/missing"
+    }
+  }
+}

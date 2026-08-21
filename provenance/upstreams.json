@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "profile": "rftoolsbuilder-1.21-7.0.5",
+  "pack": {
+    "name": "All the Mons",
+    "version": "1.2.0",
+    "commit": "c7bb230f21d14d26859d0b92548f089b3a493ad9",
+    "minecraft": "1.21.1",
+    "neoforge": "21.1.248"
+  },
+  "bluemap": {
+    "version": "5.22-agent.backport-5.22-mc1.21.1-2",
+    "commit": "9be321df995a1103808621d529eb72773e719d4d",
+    "license": "MIT"
+  },
+  "rftoolsbuilder": {
+    "version": "1.21-7.0.5",
+    "artifact": "rftoolsbuilder-1.21-7.0.5.jar",
+    "size": 1054852,
+    "sha1": "da588b53a1ee9ab55b38b94d0a24e63367a558a4",
+    "sha256": "802cea7c7eb5d6a25d820113bdd9f59fe0c15b390265b4964a46dcf024cdffa6",
+    "curseforgeProject": 347706,
+    "curseforgeFile": 8256217,
+    "sourceCommit": "b95e14835fa4378c1b13728be398c6c0de0b87ea",
+    "sourceTree": "8d9a78836bdf59a85d2a80a5d9e4db53661ec6cd",
+    "sourceCorrelation": "T4_SOURCE_CORRELATED_HIGH_CONFIDENCE",
+    "license": "MIT",
+    "sourceUseLane": "runtime-interface-and-resource-interpreter"
+  },
+  "redistribution": "No upstream assets, classes, binaries, source archives, or captured meshes are packaged."
+}

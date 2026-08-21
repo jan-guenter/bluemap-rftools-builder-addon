@@ -1,0 +1,6 @@
+{
+  "id": "bluemap-rftoolsbuilder",
+  "entrypoint": "io.github.janguenter.bluemap.rftoolsbuilder.BlueMapRftoolsBuilderAddon",
+  "dependencies": [],
+  "soft-dependencies": []
+}
