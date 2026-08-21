@@ -19,10 +19,6 @@ import java.util.Map;
 /** Emits the six client-evidenced cube-boundary shield faces. */
 final class ShieldCubeEmitter {
 
-    private static final float MINT_RED = 0x96 / 255F;
-    private static final float MINT_GREEN = 0xFF / 255F;
-    private static final float MINT_BLUE = 0xC8 / 255F;
-
     private final TextureGallery textures;
 
     ShieldCubeEmitter(TextureGallery textures) {
@@ -174,9 +170,10 @@ final class ShieldCubeEmitter {
                 1F, 0F);
         model.setMaterialIndex(start, material);
         model.setMaterialIndex(start + 1, material);
-        float red = mode == ShieldRenderMode.SHIELD ? MINT_RED : 1F;
-        float green = mode == ShieldRenderMode.SHIELD ? MINT_GREEN : 1F;
-        float blue = mode == ShieldRenderMode.SHIELD ? MINT_BLUE : 1F;
+        int tint = mode.naturalDefaultTint();
+        float red = (tint >> 16 & 0xff) / 255F;
+        float green = (tint >> 8 & 0xff) / 255F;
+        float blue = (tint & 0xff) / 255F;
         model.setColor(start, red, green, blue);
         model.setColor(start + 1, red, green, blue);
         model.setAOs(start, 1F, 1F, 1F);

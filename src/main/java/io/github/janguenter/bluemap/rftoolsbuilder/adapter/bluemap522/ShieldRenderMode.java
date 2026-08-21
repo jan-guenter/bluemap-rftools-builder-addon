@@ -29,4 +29,13 @@ enum ShieldRenderMode {
     boolean supported() {
         return this != MIMIC;
     }
+
+    int naturalDefaultTint() {
+        return switch (this) {
+            case SHIELD, TRANSP, SOLID -> 0x96ffc8;
+            case INVISIBLE, MIMIC -> throw new IllegalStateException(
+                    "mode has no emitted shield tint"
+            );
+        };
+    }
 }

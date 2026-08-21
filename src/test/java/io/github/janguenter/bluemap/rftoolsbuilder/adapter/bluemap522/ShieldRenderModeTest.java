@@ -31,4 +31,11 @@ class ShieldRenderModeTest {
         assertTrue(ShieldRenderMode.SOLID.supported());
         assertTrue(ShieldRenderMode.INVISIBLE.supported());
     }
+
+    @Test
+    void everyVisibleFixedModeUsesTheNaturalProjectorTint() {
+        assertEquals(0x96ffc8, ShieldRenderMode.SHIELD.naturalDefaultTint());
+        assertEquals(0x96ffc8, ShieldRenderMode.TRANSP.naturalDefaultTint());
+        assertEquals(0x96ffc8, ShieldRenderMode.SOLID.naturalDefaultTint());
+    }
 }

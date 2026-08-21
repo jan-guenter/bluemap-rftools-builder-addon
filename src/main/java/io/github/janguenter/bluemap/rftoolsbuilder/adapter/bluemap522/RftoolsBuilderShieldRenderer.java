@@ -24,10 +24,6 @@ import java.util.Optional;
 /** Exact shielding renderer with whole-block stock fallback. */
 final class RftoolsBuilderShieldRenderer implements BlockRenderer {
 
-    private static final float MINT_RED = 0x96 / 255F;
-    private static final float MINT_GREEN = 0xFF / 255F;
-    private static final float MINT_BLUE = 0xC8 / 255F;
-
     private final ResourcePack resourcePack;
     private final RftoolsBuilderRuntime runtime;
     private final ResourceModelRenderer stock;
@@ -102,11 +98,10 @@ final class RftoolsBuilderShieldRenderer implements BlockRenderer {
             return false;
         }
         mapColor.set(texture.getColorStraight());
-        if (mode == ShieldRenderMode.SHIELD) {
-            mapColor.r *= MINT_RED;
-            mapColor.g *= MINT_GREEN;
-            mapColor.b *= MINT_BLUE;
-        }
+        int tint = mode.naturalDefaultTint();
+        mapColor.r *= (tint >> 16 & 0xff) / 255F;
+        mapColor.g *= (tint >> 8 & 0xff) / 255F;
+        mapColor.b *= (tint & 0xff) / 255F;
         return true;
     }
 

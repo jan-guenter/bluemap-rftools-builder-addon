@@ -12,10 +12,10 @@ an internal face only when the neighboring block has the same registry ID,
 and reads all textures from the operator-installed mod.
 
 The alpha supports `invisible`, `shield`, `transp`, and `solid`. Default
-`shield` uses the client-evidenced coordinate parity texture selection and the
-natural default-projector mint tint `0x96ffc8`. `transp` and `solid` use the
-installed fixed textures. Damage and blocking properties do not affect visual
-output.
+`shield` uses the client-evidenced coordinate parity texture selection.
+`shield`, `transp`, and `solid` all use the natural default-projector mint tint
+`0x96ffc8`; the latter two use the installed fixed textures. Damage and blocking
+properties do not affect visual output.
 
 `mimic`, malformed or unknown modes, custom projector colors, stripe texture,
 and orphan-projector white fallback deliberately use BlueMap's stock result in

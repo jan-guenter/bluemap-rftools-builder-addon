@@ -16,10 +16,10 @@ standalone repository.
 
 - Own only `shielding_solid`, `shielding_translucent`, and `shielding_cutout`.
 - Support only persisted `render=invisible|shield|transp|solid`.
-- `shield` uses the installed default shield texture quartet, coordinate parity,
-  and the natural default projector tint `0x96ffc8`.
-- `transp` and `solid` use their installed fixed textures. Internal faces are
-  removed only between the same exact block ID.
+- `shield` uses the installed default shield texture quartet and coordinate
+  parity. `shield`, `transp`, and `solid` all use the natural default projector
+  tint `0x96ffc8`; the latter two use their installed fixed textures. Internal
+  faces are removed only between the same exact block ID.
 - `mimic`, unknown/malformed states, custom projector colors/textures, stripe
   mode, and orphan-projector white fallback remain stock in this alpha.
 - Package no RFToolsBuilder asset, class, source, archive, or derived mesh.

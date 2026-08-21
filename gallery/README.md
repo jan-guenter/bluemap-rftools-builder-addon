@@ -21,8 +21,8 @@ z `160..181`.
 | A | stock blue shield template | `168 100 164` | 1 | ordinary cutout-model control |
 | A | stock bricks | `172 100 164` | 1 | ordinary Minecraft-model control |
 | B | isolated SHIELD | `164 100 171` | 1 | custom loader, default shield texture and default mint tint |
-| B | isolated TRANSP | `168 100 171` | 1 | fixed transparent shield texture |
-| B | isolated SOLID | `172 100 171` | 1 | fixed solid shield texture |
+| B | isolated TRANSP | `168 100 171` | 1 | fixed transparent texture and default mint tint |
+| B | isolated SOLID | `172 100 171` | 1 | fixed solid texture and default mint tint |
 | B | invisible control | `176 100 171` | 1 | intentional zero geometry |
 | C | horizontal 2x2 SHIELD cluster | x `164..165`, y `100`, z `178..179` | 4 | all top parity tiles plus same-ID internal-face culling |
 
