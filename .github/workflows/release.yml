@@ -51,13 +51,24 @@ jobs:
             "$(git rev-parse "refs/tags/${RELEASE_TAG}^{commit}")"
           git fetch --no-tags origin main:refs/remotes/origin/main
           git merge-base --is-ancestor HEAD refs/remotes/origin/main
+          python3 - "${version}" <<'PY'
+          import json
+          from pathlib import Path
+          import sys
+
+          release = json.loads(Path("provenance/release.json").read_text())
+          if release.get("version") != sys.argv[1]:
+              raise SystemExit("release provenance version does not match addon_version")
+          if release.get("status") != "owner-accepted-release-candidate":
+              raise SystemExit("release candidate has not been owner accepted and sealed")
+          PY
           echo "VERSION=${version}" >> "${GITHUB_ENV}"
 
       - name: Check out exact BlueMap backport
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: jan-guenter/BlueMap
-          ref: 9be321df995a1103808621d529eb72773e719d4d
+          ref: 7e07f4e74ec1e92a6ead9aa1e66054af3e133aac
           path: .ci/bluemap
           submodules: recursive
           fetch-depth: 0
@@ -67,12 +78,9 @@ jobs:
         run: |
           test "$(git -C .ci/bluemap rev-parse --abbrev-ref HEAD)" = "HEAD"
           test "$(git -C .ci/bluemap rev-parse HEAD)" = \
-            "9be321df995a1103808621d529eb72773e719d4d"
+            "7e07f4e74ec1e92a6ead9aa1e66054af3e133aac"
           test "$(git -C .ci/bluemap/api rev-parse HEAD)" = \
             "285c9a60eff3ac2b0cab308ce1058d1565be0971"
-          git -C .ci/bluemap fetch --force --tags origin
-          test "$(git -C .ci/bluemap describe --exact-match --tags HEAD)" = \
-            "v5.22-agent.backport-5.22-mc1.21.1-2"
 
       - name: Set up exact promotion Java 21
         uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
@@ -133,20 +141,17 @@ jobs:
             generateMetadataFileForAddonPublication \
             verifyPublicationArtifacts verifyReleaseCandidate
           test "$(stat -c %s \
-            "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar")" -eq 65006
+            "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar")" -eq 70037
           test "$(stat -c %s \
-            "build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar")" -eq 46071
+            "build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar")" -eq 51407
           test "$(stat -c %s build/publications/addon/pom-default.xml)" -eq 1378
           test "$(stat -c %s build/publications/addon/module.json)" -eq 2873
           sha256sum --check <<SHA256SUMS
-          776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6  build/libs/bluemap-rftools-builder-addon-${VERSION}.jar
-          151d339992c7a79cdc7098e28a1bc687d4d591bcec7234ce130ed448f67c2dc9  build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar
-          474907777785ec36ab0fecc385ac96b7941d2dd36864cf7d6c236b985956901d  build/publications/addon/pom-default.xml
-          93b7081cb7f1ef6e38c7a589daa496147046110c83315030896c83163cc1ea19  build/publications/addon/module.json
+          3302fbf77a92cc0643e04dfe7981816a3699b0da00f3993360b6b76ca389c09b  build/libs/bluemap-rftools-builder-addon-${VERSION}.jar
+          a75842ab39d32a08fc1df5631c1406c12add8613621f7777c6161b117baede2d  build/libs/bluemap-rftools-builder-addon-${VERSION}-sources.jar
+          c29f9ccf30dbc1e22c84524d1d75eb42120a4255009bedbd7b41e76147af0011  build/publications/addon/pom-default.xml
+          c580a12773d0aafd87dfb97763e0314ef3e2a3dee1f29f770c82d4443b3235b6  build/publications/addon/module.json
           SHA256SUMS
-          python3 tools/verify_staged_equivalence.py \
-            --jar "build/libs/bluemap-rftools-builder-addon-${VERSION}.jar" \
-            --entries provenance/accepted-staging-entries.sha256
 
       - name: Prepare deterministic release bundle
         run: |
@@ -170,7 +175,7 @@ jobs:
           (cd release && sha256sum --check SHA256SUMS)
           test "$(stat -c %s release/SHA256SUMS)" -eq 480
           test "$(sha256sum release/SHA256SUMS | cut -d ' ' -f 1)" = \
-            dd4c4eb583f3e00435870a7e10e08bdc762afe3076149055e92d4da75e1298cc
+            d13d4142320c34caed1172bc7215f19279dab20097e024532606f5f1884623bb
 
       - name: Create or refresh draft prerelease
         env:

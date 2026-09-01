@@ -1,94 +1,132 @@
 {
   "schema_version": 1,
   "status": "owner-accepted-release-candidate",
-  "version": "0.1.0-alpha.1",
-  "release_date": "2026-08-21",
+  "published": false,
+  "version": "0.1.0-alpha.2",
+  "release_date": "2026-09-01",
   "repository": "https://github.com/jan-guenter/bluemap-rftools-builder-addon",
-  "tag": "v0.1.0-alpha.1",
-  "maven_coordinate": "io.github.jan-guenter:bluemap-rftools-builder-addon:0.1.0-alpha.1",
-  "owner_accepted_staging": {
-    "commit": "18b11a27b03ad1001524d66f75233dcec1676f19",
-    "tree": "4214668d311de570c6fac0d61c926fa5b1daaf32",
-    "production_jar_size": 33582,
-    "production_jar_sha256": "08eec9d61e3dc6633408e3830e83c892c27baf108297d0c612d548fc043ae3d0",
-    "accepted_at": "2026-08-21",
-    "visual_acceptance": true,
-    "geometry": {
-      "custom_triangles": 68,
-      "isolated_shield_triangles": 12,
-      "isolated_transp_triangles": 12,
-      "isolated_solid_triangles": 12,
-      "isolated_invisible_triangles": 0,
-      "cluster_triangles_per_cell": 8,
-      "cluster_cells": 4,
-      "internal_xz_plane_triangles": 0,
-      "visible_vertices": 204,
-      "mint_vertices": 204
-    }
+  "tag": "v0.1.0-alpha.2",
+  "maven_coordinate": "io.github.jan-guenter:bluemap-rftools-builder-addon:0.1.0-alpha.2",
+  "bluemap": {
+    "version": "5.22-feature.backport-5.23-stateless-java-web-server-46",
+    "commit": "7e07f4e74ec1e92a6ead9aa1e66054af3e133aac",
+    "api_commit": "285c9a60eff3ac2b0cab308ce1058d1565be0971"
   },
-  "final_release_artifacts": {
+  "adapter_api": {
+    "version": "0.1.0-alpha.2",
+    "commit": "e81f08bc4bfbf02d810ec8949a019130e2e61634",
+    "source_tree": "2f974c9bb2ba13888d69682f86f30f58922d30eb",
+    "source_files_compiled": 4,
+    "module_jar_installed": false,
+    "module_jar_bundled": false,
+    "module_jar_nested": false,
+    "local_adapter_package": "io.github.janguenter.bluemap.rftoolsbuilder.adapter.bluemap523"
+  },
+  "baseline_release": {
+    "version": "0.1.0-alpha.1",
+    "tag": "v0.1.0-alpha.1",
+    "commit": "64471638ed4f61c102bd5f54986fba1cd467d6dd",
+    "production_jar_size": 65006,
+    "production_jar_sha256": "776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6",
+    "owner_visual_acceptance": "2026-08-21"
+  },
+  "candidate_artifacts": {
     "production_jar": {
-      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.jar",
-      "size": 65006,
-      "sha256": "776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6"
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2.jar",
+      "size": 70037,
+      "sha256": "3302fbf77a92cc0643e04dfe7981816a3699b0da00f3993360b6b76ca389c09b"
     },
     "sources_jar": {
-      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1-sources.jar",
-      "size": 46071,
-      "sha256": "151d339992c7a79cdc7098e28a1bc687d4d591bcec7234ce130ed448f67c2dc9"
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2-sources.jar",
+      "size": 51407,
+      "sha256": "a75842ab39d32a08fc1df5631c1406c12add8613621f7777c6161b117baede2d"
     },
     "pom": {
-      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.pom",
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2.pom",
       "size": 1378,
-      "sha256": "474907777785ec36ab0fecc385ac96b7941d2dd36864cf7d6c236b985956901d"
+      "sha256": "c29f9ccf30dbc1e22c84524d1d75eb42120a4255009bedbd7b41e76147af0011"
     },
     "gradle_module": {
-      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.module.json",
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2.module.json",
       "size": 2873,
-      "sha256": "93b7081cb7f1ef6e38c7a589daa496147046110c83315030896c83163cc1ea19"
+      "sha256": "c580a12773d0aafd87dfb97763e0314ef3e2a3dee1f29f770c82d4443b3235b6"
     },
     "sha256sums": {
       "file_name": "SHA256SUMS",
       "size": 480,
-      "sha256": "dd4c4eb583f3e00435870a7e10e08bdc762afe3076149055e92d4da75e1298cc"
+      "sha256": "d13d4142320c34caed1172bc7215f19279dab20097e024532606f5f1884623bb"
     }
   },
-  "staged_equivalence": {
-    "entry_manifest": "provenance/accepted-staging-entries.sha256",
-    "identical_non_manifest_entries": 22,
-    "whole_jar_byte_identical": false,
-    "only_changed_entry_bytes": "META-INF/MANIFEST.MF",
-    "change_reason": "Implementation-Version changed from the staged SNAPSHOT marker to the final release version.",
-    "archive_normalization": "Every release JAR entry uses ZIP STORED compression and empty directories are excluded so archive bytes do not depend on host compression or untracked filesystem directories."
+  "preserved_contract": {
+    "routed_hosts": 3,
+    "supported_modes": 4,
+    "gallery_shielding_cells": 8,
+    "gallery_assertions_per_phase": 20,
+    "gallery_sources_changed": false,
+    "profiles_and_resources_changed": false,
+    "renderer_behavior_changed": false,
+    "stock_fallback_changed": false
   },
-  "gallery": {
-    "archive_file_name": "bluemap-rftools-builder-gallery.zip",
-    "size": 3551,
-    "sha256": "67886fc6796f8bcf7e67c4245d355725a03f0d3c5fa953ca3c8facdf8a9b9988",
-    "stock_controls": 3,
-    "shielding_cells": 8,
-    "assertions_per_phase": 20,
-    "phases": 2,
-    "published_as_release_asset": false
-  },
-  "ephemeral_ci_inputs": {
-    "rftoolsbuilder": {
-      "curseforge_project": 347706,
-      "curseforge_file": 8256217,
-      "size": 1054852,
-      "sha256": "802cea7c7eb5d6a25d820113bdd9f59fe0c15b390265b4964a46dcf024cdffa6"
-    },
-    "policy": "Downloaded only into the ephemeral runner, verified before use, and never bundled or uploaded."
+  "ephemeral_ci_input": {
+    "rftoolsbuilder_size": 1054852,
+    "rftoolsbuilder_sha256": "802cea7c7eb5d6a25d820113bdd9f59fe0c15b390265b4964a46dcf024cdffa6"
   },
   "verification": {
-    "production_jar_exact_byte_gate": true,
-    "sources_jar_exact_byte_gate": true,
-    "publication_metadata_exact_byte_gate": true,
-    "gallery_archive_exact_byte_gate": true,
-    "exact_input_gate": true
+    "exact_input_gate": true,
+    "adapter_api_gitlink_and_source_tree_gate": true,
+    "production_archive_boundary_gate": true,
+    "sources_archive_boundary_gate": true,
+    "local_candidate_artifact_identity_gate": true,
+    "authoritative_pr_ci_reproduction": true,
+    "local_gradle_version": "9.6.1",
+    "local_java_runtime": "21.0.12.1+1",
+    "exact_alpha_2_runtime_review": true
   },
-  "immutable_packaged_provenance": {
-    "path": "provenance/upstreams.json",
-    "note": "Implementation provenance packaged in the accepted JAR remains byte-identical. Release-only identities are kept outside the JAR."
+  "owner_accepted_staging": {
+    "visual_acceptance": true,
+    "accepted_on": "2026-09-01",
+    "scope": "Owner accepted the RFTools Builder gallery after the scalar gallery-position correction. The accepted renderer, profile, textures, and gallery are the alpha.2 candidate bytes; the aggregate staging JAR differs only at the integration entrypoint overlay.",
+    "integration_run": "bluemap-atmons-integration-20260901-native-batch-v37",
+    "candidate_manifest": {
+      "sha256": "ed760f1863e3e00cfd4786fdf2a58c9ec0ab3f6d722149384a421a6de3e6be68",
+      "local_candidate_base_source_commit": "5cd7dc492ecadf9818e53cddb75531463ddca37f",
+      "local_candidate_base_artifact": {
+        "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2.jar",
+        "size": 70037,
+        "sha256": "3302fbf77a92cc0643e04dfe7981816a3699b0da00f3993360b6b76ca389c09b"
+      },
+      "aggregate_staging_artifact": {
+        "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.1.jar",
+        "size": 70407,
+        "sha256": "fb5a746d4ef62832d3e67aada88524e65ee35d5470e20fea2b66b03dc8491f35"
+      }
+    },
+    "browser_capture": {
+      "file_name": "rftools-builder.png",
+      "size": 674501,
+      "sha256": "77b26d4de1c300cf10821a3fb9c8aad25400c750aba697db874f9b17086e9688"
+    }
+  },
+  "final_release_artifacts": {
+    "production_jar": {
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2.jar",
+      "size": 70037,
+      "sha256": "3302fbf77a92cc0643e04dfe7981816a3699b0da00f3993360b6b76ca389c09b"
+    },
+    "sources_jar": {
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2-sources.jar",
+      "size": 51407,
+      "sha256": "a75842ab39d32a08fc1df5631c1406c12add8613621f7777c6161b117baede2d"
+    },
+    "pom": {
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2.pom",
+      "size": 1378,
+      "sha256": "c29f9ccf30dbc1e22c84524d1d75eb42120a4255009bedbd7b41e76147af0011"
+    },
+    "gradle_module": {
+      "file_name": "bluemap-rftools-builder-addon-0.1.0-alpha.2.module.json",
+      "size": 2873,
+      "sha256": "c580a12773d0aafd87dfb97763e0314ef3e2a3dee1f29f770c82d4443b3235b6"
+    }
   }
 }
