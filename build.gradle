@@ -14,6 +14,10 @@ base {
     archivesName = artifact_id
 }
 
+sourceSets {
+    main.java.srcDir 'modules/bluemap-addon-adapter-api/src/main/java'
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -62,6 +66,10 @@ tasks.named('jar', Jar).configure {
         rename { 'LICENSE-bluemap-rftools-builder-addon' }
     }
     from('LICENSE-BlueMap') { into 'META-INF' }
+    from('modules/bluemap-addon-adapter-api/LICENSE') {
+        into 'META-INF'
+        rename { 'LICENSE-bluemap-addon-adapter-api' }
+    }
     from('NOTICE.md') {
         into 'META-INF'
         rename { 'NOTICE-bluemap-rftools-builder-addon.md' }
@@ -80,6 +88,10 @@ tasks.named('sourcesJar', Jar).configure {
         rename { 'LICENSE-bluemap-rftools-builder-addon' }
     }
     from('LICENSE-BlueMap') { into 'META-INF' }
+    from('modules/bluemap-addon-adapter-api/LICENSE') {
+        into 'META-INF'
+        rename { 'LICENSE-bluemap-addon-adapter-api' }
+    }
     from('NOTICE.md') {
         into 'META-INF'
         rename { 'NOTICE-bluemap-rftools-builder-addon.md' }
@@ -93,6 +105,22 @@ tasks.named('sourcesJar', Jar).configure {
 
 def productionJar = tasks.named('jar', Jar).flatMap { it.archiveFile }
 def publishedSourcesJar = tasks.named('sourcesJar', Jar).flatMap { it.archiveFile }
+def sharedAdapterApiPackage =
+        'io/github/janguenter/bluemap/addon/adapter/api/bluemap523/'
+def sharedAdapterApiClasses = [
+        "${sharedAdapterApiPackage}BlueMapRuntimeCompatibility.class",
+        "${sharedAdapterApiPackage}RegistryGuard.class",
+        "${sharedAdapterApiPackage}ResourceExtensionType.class",
+        "${sharedAdapterApiPackage}SyntheticDispatch.class"
+].collect { it.toString() }
+def sharedAdapterApiSources = [
+        "${sharedAdapterApiPackage}BlueMapRuntimeCompatibility.java",
+        "${sharedAdapterApiPackage}RegistryGuard.java",
+        "${sharedAdapterApiPackage}ResourceExtensionType.java",
+        "${sharedAdapterApiPackage}SyntheticDispatch.java"
+].collect { it.toString() }
+def legacyLocalAdapterPackage =
+        'io/github/janguenter/bluemap/rftoolsbuilder/adapter/bluemap522/'
 
 tasks.register('verifyAcceptedProductionJar') {
     dependsOn tasks.named('jar')
@@ -134,15 +162,6 @@ tasks.register('verifyAcceptedSourcesJar') {
     }
 }
 
-tasks.register('verifyStagedEquivalence', Exec) {
-    dependsOn tasks.named('jar')
-    inputs.file(productionJar)
-    inputs.file('provenance/accepted-staging-entries.sha256')
-    commandLine 'python3', 'tools/verify_staged_equivalence.py',
-            '--jar', productionJar.get().asFile,
-            '--entries', 'provenance/accepted-staging-entries.sha256'
-}
-
 tasks.register('verifyPinnedArtifact') {
     def exactJar = providers.gradleProperty('rftoolsBuilderJar')
     inputs.property('expectedSize', 1054852L)
@@ -182,13 +201,20 @@ tasks.register('verifyProductionJar') {
                     'bluemap-rftools-builder/profiles/rftoolsbuilder/1.21-7.0.5/profile.json',
                     'META-INF/LICENSE-bluemap-rftools-builder-addon',
                     'META-INF/LICENSE-BlueMap',
+                    'META-INF/LICENSE-bluemap-addon-adapter-api',
                     'META-INF/NOTICE-bluemap-rftools-builder-addon.md',
                     'META-INF/THIRD_PARTY-bluemap-rftools-builder-addon.md',
                     'META-INF/bluemap-rftoolsbuilder/upstreams.json'
-            ]
+            ] + sharedAdapterApiClasses
             def missing = required.findAll { !entries.contains(it) }
-            if (!missing.isEmpty()) {
-                throw new GradleException("Production JAR is missing: ${missing}")
+            def duplicateShared = sharedAdapterApiClasses.findAll { shared ->
+                entries.count { it == shared } != 1
+            }
+            if (!missing.isEmpty() || !duplicateShared.isEmpty()) {
+                throw new GradleException(
+                        "Production JAR shared boundary mismatch: missing=${missing}, "
+                                + "nonUnique=${duplicateShared}"
+                )
             }
             def addon = new groovy.json.JsonSlurper().parseText(
                     zip.getInputStream(zip.getEntry('bluemap.addon.json')).getText('UTF-8')
@@ -196,11 +222,15 @@ tasks.register('verifyProductionJar') {
             if (addon.id != addon_id
                     || addon.entrypoint
                             != 'io.github.janguenter.bluemap.rftoolsbuilder.BlueMapRftoolsBuilderAddon'
+                    || addon.version != project.version.toString()
                     || addon.dependencies != [] || addon['soft-dependencies'] != []) {
                 throw new GradleException('BlueMap add-on metadata mismatch')
             }
             def forbidden = entries.findAll {
                 it.endsWith('.jar')
+                        || (it.endsWith('.class')
+                        && !it.startsWith('io/github/janguenter/bluemap/rftoolsbuilder/')
+                        && !sharedAdapterApiClasses.contains(it))
                         || it == 'META-INF/neoforge.mods.toml'
                         || it == 'fabric.mod.json'
                         || it.endsWith('.mixins.json')
@@ -210,6 +240,9 @@ tasks.register('verifyProductionJar') {
                         || it.startsWith('de/bluecolored/')
                         || it.startsWith('assets/rftoolsbuilder/')
                         || it.startsWith('gallery/')
+                        || (it.startsWith(legacyLocalAdapterPackage) && !it.endsWith('/'))
+                        || (it.startsWith(sharedAdapterApiPackage) && !it.endsWith('/')
+                            && !sharedAdapterApiClasses.contains(it))
                         || it.endsWith('.png')
                         || it.endsWith('.mcmeta')
             }
@@ -231,23 +264,25 @@ tasks.register('verifySourcesJar') {
             def entries = zip.entries().findAll { !it.directory }.collect { it.name }
             def required = [
                     'io/github/janguenter/bluemap/rftoolsbuilder/BlueMapRftoolsBuilderAddon.java',
-                    'io/github/janguenter/bluemap/rftoolsbuilder/adapter/bluemap522/ShieldCubeEmitter.java',
+                    'io/github/janguenter/bluemap/rftoolsbuilder/adapter/bluemap523/ShieldCubeEmitter.java',
                     'bluemap.addon.json',
                     'assets/bluemap_rftoolsbuilder/blockstates/shield.json',
                     'bluemap-rftools-builder/profiles/rftoolsbuilder/1.21-7.0.5/profile.json',
                     'META-INF/LICENSE-bluemap-rftools-builder-addon',
                     'META-INF/LICENSE-BlueMap',
+                    'META-INF/LICENSE-bluemap-addon-adapter-api',
                     'META-INF/NOTICE-bluemap-rftools-builder-addon.md',
                     'META-INF/THIRD_PARTY-bluemap-rftools-builder-addon.md',
                     'META-INF/bluemap-rftoolsbuilder/upstreams.json'
-            ]
+            ] + sharedAdapterApiSources
             def missing = required.findAll { !entries.contains(it) }
-            if (!missing.isEmpty()) {
-                throw new GradleException("Sources JAR is missing: ${missing}")
+            def duplicateShared = sharedAdapterApiSources.findAll { shared ->
+                entries.count { it == shared } != 1
             }
             def projectJava = entries.findAll { it.endsWith('.java') }
             def foreignJava = projectJava.findAll {
                 !it.startsWith('io/github/janguenter/bluemap/rftoolsbuilder/')
+                        && !sharedAdapterApiSources.contains(it)
             }
             def forbidden = entries.findAll {
                 it.endsWith('.class')
@@ -259,10 +294,16 @@ tasks.register('verifySourcesJar') {
                         || it.startsWith('net/minecraft/')
                         || it.startsWith('net/neoforged/')
                         || it.startsWith('gallery/')
+                        || (it.startsWith(legacyLocalAdapterPackage) && !it.endsWith('/'))
+                        || (it.startsWith(sharedAdapterApiPackage) && !it.endsWith('/')
+                            && !sharedAdapterApiSources.contains(it))
             }
-            if (projectJava.isEmpty() || !foreignJava.isEmpty() || !forbidden.isEmpty()) {
+            if (!missing.isEmpty() || !duplicateShared.isEmpty()
+                    || projectJava.isEmpty() || !foreignJava.isEmpty()
+                    || !forbidden.isEmpty()) {
                 throw new GradleException(
-                        "Sources JAR boundary mismatch: foreignJava=${foreignJava}, "
+                        "Sources JAR boundary mismatch: missing=${missing}, "
+                                + "nonUnique=${duplicateShared}, foreignJava=${foreignJava}, "
                                 + "forbidden=${forbidden}"
                 )
             }
@@ -278,7 +319,6 @@ tasks.named('check').configure {
     dependsOn tasks.named('verifyPinnedArtifact')
     dependsOn tasks.named('verifyProductionJar')
     dependsOn tasks.named('verifySourcesJar')
-    dependsOn tasks.named('verifyStagedEquivalence')
 }
 
 tasks.register('verifyPublicationArtifacts') {

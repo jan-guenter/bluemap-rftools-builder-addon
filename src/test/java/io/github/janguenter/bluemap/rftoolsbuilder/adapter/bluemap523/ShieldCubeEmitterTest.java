@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package io.github.janguenter.bluemap.rftoolsbuilder.adapter.bluemap522;
+package io.github.janguenter.bluemap.rftoolsbuilder.adapter.bluemap523;
 
 import de.bluecolored.bluemap.core.util.Direction;
 import io.github.janguenter.bluemap.rftoolsbuilder.profile.RftoolsBuilder705Profile;
