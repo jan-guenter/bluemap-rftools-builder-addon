@@ -4,9 +4,16 @@
 
 - Project: BlueMap
 - License: MIT
-- Runtime profile: upstream 5.22 and the exact Java 21 backport recorded in
+- Runtime profile: exact 5.23 feature backport recorded in
   `provenance/upstreams.json`
 - Use: compile-time/internal renderer API integration
+
+## BlueMap Add-on Adapter API
+
+- Version: `0.1.0-alpha.2` at commit
+  `e81f08bc4bfbf02d810ec8949a019130e2e61634`
+- License: MIT
+- Use: four source-compiled adapter helpers; standalone JAR not bundled
 
 ## RFToolsBuilder
 

@@ -2,9 +2,14 @@
 
 This project is independently packaged as an MIT BlueMap add-on.
 
-It interoperates with BlueMap 5.22 and RFToolsBuilder 1.21-7.0.5. The operator's
-installed RFToolsBuilder textures are referenced at runtime; no upstream model,
-texture, class, source archive, or binary is redistributed.
+It interoperates with the exact BlueMap 5.23 feature backport and
+RFToolsBuilder 1.21-7.0.5. The operator's installed RFToolsBuilder textures are
+referenced at runtime; no upstream model, texture, class, source archive, or
+binary is redistributed.
+
+The add-on compiles four MIT helpers from the exact
+`bluemap-addon-adapter-api` source pin. Its standalone JAR is neither nested
+nor installed, and its license is packaged with this add-on.
 
 The exact RFToolsBuilder source candidate used to confirm the persisted and
 client-visible contracts is MIT-licensed McJtyMods source at commit

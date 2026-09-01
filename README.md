@@ -2,12 +2,15 @@
 
 [![CI](https://github.com/jan-guenter/bluemap-rftools-builder-addon/actions/workflows/ci.yml/badge.svg)](https://github.com/jan-guenter/bluemap-rftools-builder-addon/actions/workflows/ci.yml)
 
-A narrow Java 21 BlueMap 5.22 add-on for the dynamic RFToolsBuilder shield
-blocks that BlueMap's ordinary resource-model path cannot interpret.
+A narrow Java 21 add-on for the exact BlueMap 5.23 feature backport and the
+dynamic RFToolsBuilder shield blocks that BlueMap's ordinary resource-model
+path cannot interpret.
 
-Version `0.1.0-alpha.1` is the owner-accepted release candidate. Its final
-production JAR is 65,006 bytes with SHA-256
-`776d4242bf6826a8aafe081aca5b32f242bc0af5677efccbdd3469b65ba7cfe6`.
+Version `0.1.0-alpha.2` is the unpublished BlueMap 5.23 migration candidate.
+Its production JAR is 70,037 bytes with SHA-256
+`3302fbf77a92cc0643e04dfe7981816a3699b0da00f3993360b6b76ca389c09b`.
+It preserves the owner-accepted alpha.1 renderer, profile, gallery, and
+fallback behavior.
 
 The add-on activates only with the exact All the Mons 1.2.0
 `rftoolsbuilder-1.21-7.0.5.jar` (1,054,852 bytes, SHA-256
@@ -31,9 +34,12 @@ or captured mesh is packaged.
 ## Build
 
 ```bash
+git submodule update --init --recursive -- \
+  tooling/bluemap-addon-toolkit modules/bluemap-addon-adapter-api
 gradle --no-daemon \
+  -PbluemapSourcePath=/absolute/path/to/BlueMap-at-7e07f4e7 \
   -PrftoolsBuilderJar=/absolute/path/rftoolsbuilder-1.21-7.0.5.jar \
-  -PreleaseTag=v0.1.0-alpha.1 \
+  -PreleaseTag=v0.1.0-alpha.2 \
   clean check build generatePomFileForAddonPublication \
   generateMetadataFileForAddonPublication verifyPublicationArtifacts \
   verifyReleaseCandidate
@@ -42,8 +48,15 @@ gradle --no-daemon \
 The output JAR belongs in BlueMap's `packs` directory. Removing it and
 restarting restores stock rendering without changing world data.
 
-The intended immutable tag is `v0.1.0-alpha.1`, and the Maven coordinate is
-`io.github.jan-guenter:bluemap-rftools-builder-addon:0.1.0-alpha.1`.
+The exact BlueMap checkout is commit
+`7e07f4e74ec1e92a6ead9aa1e66054af3e133aac` with API commit
+`285c9a60eff3ac2b0cab308ce1058d1565be0971`. The Adapter API source module is
+pinned at commit `e81f08bc4bfbf02d810ec8949a019130e2e61634`, source tree
+`2f974c9bb2ba13888d69682f86f30f58922d30eb`; exactly four helpers are compiled
+as source and no module JAR is installed, bundled, or nested.
+
+The intended immutable tag is `v0.1.0-alpha.2`, and the Maven coordinate is
+`io.github.jan-guenter:bluemap-rftools-builder-addon:0.1.0-alpha.2`.
 Publication is allowed only after the independently audited pull request and
 its final-head CI pass. See [the release procedure](docs/RELEASING.md) and
 [recorded candidate provenance](provenance/release.json).
