@@ -6,7 +6,7 @@ A narrow Java 21 add-on for the exact BlueMap 5.23 feature backport and the
 dynamic RFToolsBuilder shield blocks that BlueMap's ordinary resource-model
 path cannot interpret.
 
-Version `0.1.0-alpha.2` is the unpublished BlueMap 5.23 migration candidate.
+Version `0.1.0-alpha.2` is the owner-accepted BlueMap 5.23 release candidate.
 Its production JAR is 70,037 bytes with SHA-256
 `3302fbf77a92cc0643e04dfe7981816a3699b0da00f3993360b6b76ca389c09b`.
 It preserves the owner-accepted alpha.1 renderer, profile, gallery, and
